@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Where's Taco Bell??</title>
+<link rel='shortcut icon' href='favicon.ico' type='image/x-icon'/ >
+
+  <!-- Javascript:  JQuery from a content distribution network (CDN) -->
+  <script
+     src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+  </script>
+
+   <!-- Leaflet.css for map functionality-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+
+</head>
+
+   <!-- Our own style sheet -->
+   <link rel="stylesheet" href="/static/css/karaoke.css" />
+
+<body>
+   <div id="mapid"></div>
+
+<script type="text/javascript">
+var mymap = L.map('mapid').setView([44.052, -123.102], 10);
+    mymap.locate({setView: true, maxZoom: 12});
+  $.getJSON("/_tacobell_locations", {},
+    // response handler
+    function(data) {
+      /*
+       * Get locations from file through flask
+       * then send latitude and longitude to
+       * marker objects. Send notes to Popup.
+       */
+       var loc_list = data.result.locations;
+       //console.log("Got a response: " +  locations);
+       //console.log("Got a response: " +  loc_list.length);
+
+       for (i = 0; i < loc_list.length; i++) {
+         var locations = loc_list[i];
+         var notes = locations[0];
+         //console.log("Got a response: " +  notes);
+         var longitude = Number(locations[1]);
+         //console.log("Got a response: " +  longitude);
+         var latitude = Number(locations[2]);
+         //console.log("Got a response: " +  latitude);
+
+
+         L.marker([latitude, longitude]).addTo(mymap)
+          .bindPopup(notes)
+          .openPopup();
+
+       }
+
+     } // end of handler function
+   );// End of getJSON
+
+  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 18,
+    id: 'bearwithscissors.1ogcjcpf',
+    //TODO add accessToken
+    accessToken: 'pk.eyJ1IjoiYmVhcndpdGhzY2lzc29ycyIsImEiOiJjaXVxMGEzOW0wMmQ5MnVwZWdxY3RycG53In0.VO3zpd5u5lRGX5mIJnxUbQ'
+}).addTo(mymap);
+
+</script>
+
+</body> </html>
